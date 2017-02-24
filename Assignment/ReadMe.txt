@@ -1,0 +1,1 @@
+The assignments are collected from http://www.mohamedaly.info/teaching/cmp-462-spring-2013
