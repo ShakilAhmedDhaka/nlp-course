@@ -16,6 +16,7 @@ import sys
 import getopt
 import os
 import math
+import collections
 
 class NaiveBayes:
   class TrainSplit:
@@ -39,6 +40,10 @@ class NaiveBayes:
     self.FILTER_STOP_WORDS = False
     self.stopList = set(self.readFile('../data/english.stop'))
     self.numFolds = 10
+    self.pos = collections.defaultdict(lambda: 0)
+    self.neg = collections.defaultdict(lambda: 0)
+    self.pos_words = 0
+    self.neg_words = 0
 
   #############################################################################
   # TODO TODO TODO TODO TODO
@@ -47,7 +52,18 @@ class NaiveBayes:
     """ TODO
       'words' is a list of words to classify. Return 'pos' or 'neg' classification.
     """
-    return 'pos'
+    
+    prob_pos = math.log(len(self.pos)) - math.log((len(self.pos)+len(self.neg)))
+    prob_neg = math.log(len(self.neg)) - math.log((len(self.pos)+len(self.neg)))
+
+    for i in words:
+      prob_pos += math.log(self.pos[i]+1) - math.log(self.pos_words+len(self.pos))
+      prob_neg += math.log(self.neg[i]+1) - math.log(self.neg_words+len(self.pos))
+
+    if prob_pos > prob_neg:
+      return 'pos'
+    else:
+      return 'neg'
 
 
   def addExample(self, klass, words):
@@ -59,14 +75,26 @@ class NaiveBayes:
      * in the NaiveBayes class.
      * Returns nothing
     """
-    pass
+
+    if klass == 'pos':
+      for i in words:
+        self.pos[i] += 1
+        self.pos_words += 1
+    else:
+      for i in words:
+        self.neg[i] += 1
+        self.neg_words += 1
+    
 
   def filterStopWords(self, words):
     """
     * TODO
     * Filters stop words found in self.stopList.
     """
-    return words
+  
+    new_words = [i for i in words if i not in self.stopList]
+    
+    return new_words
 
   # TODO TODO TODO TODO TODO
   #############################################################################
